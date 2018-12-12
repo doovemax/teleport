@@ -26,7 +26,6 @@ package auth
 import (
 	"context"
 	"crypto"
-	"crypto/x509"
 	"fmt"
 	"golang.org/x/crypto/ssh"
 	"math/rand"
@@ -693,50 +692,6 @@ func (s *AuthServer) GenerateToken(req GenerateTokenRequest) (string, error) {
 		return "", trace.Wrap(err)
 	}
 	return req.Token, nil
-}
-
-// ClientCertPool returns trusted x509 cerificate authority pool
-func (s *AuthServer) ClientCertPool(clusterName string) (*x509.CertPool, error) {
-	pool := x509.NewCertPool()
-	var authorities []services.CertAuthority
-	if clusterName == "" {
-		hostCAs, err := s.GetCertAuthorities(services.HostCA, false, services.SkipValidation())
-		if err != nil {
-			return nil, trace.Wrap(err)
-		}
-		userCAs, err := s.GetCertAuthorities(services.UserCA, false, services.SkipValidation())
-		if err != nil {
-			return nil, trace.Wrap(err)
-		}
-		authorities = append(authorities, hostCAs...)
-		authorities = append(authorities, userCAs...)
-	} else {
-		hostCA, err := s.GetCertAuthority(
-			services.CertAuthID{Type: services.HostCA, DomainName: clusterName},
-			false, services.SkipValidation())
-		if err != nil {
-			return nil, trace.Wrap(err)
-		}
-		userCA, err := s.GetCertAuthority(
-			services.CertAuthID{Type: services.UserCA, DomainName: clusterName},
-			false, services.SkipValidation())
-		if err != nil {
-			return nil, trace.Wrap(err)
-		}
-		authorities = append(authorities, hostCA)
-		authorities = append(authorities, userCA)
-	}
-
-	for _, auth := range authorities {
-		for _, keyPair := range auth.GetTLSKeyPairs() {
-			cert, err := tlsca.ParseCertificatePEM(keyPair.Cert)
-			if err != nil {
-				return nil, trace.Wrap(err)
-			}
-			pool.AddCert(cert)
-		}
-	}
-	return pool, nil
 }
 
 // ExtractHostID returns host id based on the hostname

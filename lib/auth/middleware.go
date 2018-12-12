@@ -139,9 +139,7 @@ func (t *TLSServer) GetConfigForClient(info *tls.ClientHelloInfo) (*tls.Config, 
 	// certificate authorities.
 	// TODO(klizhentas) drop connections of the TLS cert authorities
 	// that are not trusted
-	// TODO(klizhentas) what are performance implications of returning new config
-	// per connections? E.g. what happens to session tickets. Benchmark this.
-	pool, err := t.AuthServer.ClientCertPool(clusterName)
+	pool, err := ClientCertPool(t.AccessPoint, clusterName)
 	if err != nil {
 		log.Errorf("failed to retrieve client pool: %v", trace.DebugReport(err))
 		// this falls back to the default config
@@ -296,19 +294,36 @@ func (a *AuthMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // ClientCertPool returns trusted x509 cerificate authority pool
-func ClientCertPool(client AccessPoint) (*x509.CertPool, error) {
+func ClientCertPool(client AccessPoint, clusterName string) (*x509.CertPool, error) {
 	pool := x509.NewCertPool()
 	var authorities []services.CertAuthority
-	hostCAs, err := client.GetCertAuthorities(services.HostCA, false)
-	if err != nil {
-		return nil, trace.Wrap(err)
+	if clusterName == "" {
+		hostCAs, err := client.GetCertAuthorities(services.HostCA, false, services.SkipValidation())
+		if err != nil {
+			return nil, trace.Wrap(err)
+		}
+		userCAs, err := client.GetCertAuthorities(services.UserCA, false, services.SkipValidation())
+		if err != nil {
+			return nil, trace.Wrap(err)
+		}
+		authorities = append(authorities, hostCAs...)
+		authorities = append(authorities, userCAs...)
+	} else {
+		hostCA, err := client.GetCertAuthority(
+			services.CertAuthID{Type: services.HostCA, DomainName: clusterName},
+			false, services.SkipValidation())
+		if err != nil {
+			return nil, trace.Wrap(err)
+		}
+		userCA, err := client.GetCertAuthority(
+			services.CertAuthID{Type: services.UserCA, DomainName: clusterName},
+			false, services.SkipValidation())
+		if err != nil {
+			return nil, trace.Wrap(err)
+		}
+		authorities = append(authorities, hostCA)
+		authorities = append(authorities, userCA)
 	}
-	userCAs, err := client.GetCertAuthorities(services.UserCA, false)
-	if err != nil {
-		return nil, trace.Wrap(err)
-	}
-	authorities = append(authorities, hostCAs...)
-	authorities = append(authorities, userCAs...)
 
 	for _, auth := range authorities {
 		for _, keyPair := range auth.GetTLSKeyPairs() {

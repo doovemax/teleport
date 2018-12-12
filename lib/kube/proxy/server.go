@@ -121,7 +121,18 @@ func (t *TLSServer) Serve(listener net.Listener) error {
 // and server's GetConfigForClient reloads the list of trusted
 // local and remote certificate authorities
 func (t *TLSServer) GetConfigForClient(info *tls.ClientHelloInfo) (*tls.Config, error) {
-	pool, err := auth.ClientCertPool(t.AccessPoint)
+	var clusterName string
+	var err error
+	if info.ServerName != "" {
+		clusterName, err = auth.DecodeClusterName(info.ServerName)
+		if err != nil {
+			if !trace.IsNotFound(err) {
+				log.Warningf("Client sent unsupported cluster name %q, what resulted in error %v.", info.ServerName, err)
+				return nil, trace.AccessDenied("access is denied")
+			}
+		}
+	}
+	pool, err := auth.ClientCertPool(t.AccessPoint, clusterName)
 	if err != nil {
 		log.Errorf("failed to retrieve client pool: %v", trace.DebugReport(err))
 		// this falls back to the default config
