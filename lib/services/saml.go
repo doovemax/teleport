@@ -202,12 +202,24 @@ func (*TeleportSAMLConnectorMarshaler) MarshalSAMLConnector(c SAMLConnector, opt
 type SAMLConnectorV2 struct {
 	// Kind is a resource kind
 	Kind string `json:"kind"`
+	// SubKind is a resource sub kind
+	SubKind string `json:"sub_kind,omitempty"`
 	// Version is version
 	Version string `json:"version"`
 	// Metadata is connector metadata
 	Metadata Metadata `json:"metadata"`
 	// Spec contains connector specification
 	Spec SAMLConnectorSpecV2 `json:"spec"`
+}
+
+// GetKind returns resource kind
+func (o *SAMLConnectorV2) GetKind() string {
+	return o.Kind
+}
+
+// GetSubKind returns resource sub kind
+func (o *SAMLConnectorV2) GetSubKind() string {
+	return o.SubKind
 }
 
 // GetResourceID returns resource ID

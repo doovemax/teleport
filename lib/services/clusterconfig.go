@@ -171,6 +171,9 @@ type ClusterConfigV3 struct {
 	// Kind is a resource kind - always resource.
 	Kind string `json:"kind"`
 
+	// SubKind is a resource sub kind
+	SubKind string `json:"sub_kind,omitempty"`
+
 	// Version is a resource version.
 	Version string `json:"version"`
 
@@ -233,6 +236,16 @@ type ClusterConfigSpecV3 struct {
 	// KeepAliveCountMax is the number of keep-alive messages that can be missed before
 	// the server disconnects the connection to the client.
 	KeepAliveCountMax int `json:"keep_alive_count_max"`
+}
+
+// GetSubKind returns resource subkind
+func (c *ClusterConfigV3) GetSubKind() string {
+	return c.SubKind
+}
+
+// GetKind returns resource kind
+func (c *ClusterConfigV3) GetKind() string {
+	return c.Kind
 }
 
 // GetResourceID returns resource ID

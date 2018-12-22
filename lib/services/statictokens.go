@@ -83,6 +83,9 @@ type StaticTokensV2 struct {
 	// Kind is a resource kind - always resource.
 	Kind string `json:"kind"`
 
+	// SubKind is a resource sub kind
+	SubKind string `json:"sub_kind,omitempty"`
+
 	// Version is a resource version.
 	Version string `json:"version"`
 
@@ -98,6 +101,16 @@ type StaticTokensSpecV2 struct {
 	// StaticTokens is a list of tokens that can be used to add nodes to the
 	// cluster.
 	StaticTokens []ProvisionToken `json:"static_tokens"`
+}
+
+// GetKind returns resource kind
+func (c *StaticTokensV2) GetKind() string {
+	return c.Kind
+}
+
+// GetSubKind returns resource sub kind
+func (c *StaticTokensV2) GetSubKind() string {
+	return c.SubKind
 }
 
 // GetResourceID returns resource ID

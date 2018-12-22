@@ -220,12 +220,7 @@ func setSigningKeys(ca services.CertAuthority, loadSigningKeys bool) {
 	if loadSigningKeys {
 		return
 	}
-	ca.SetSigningKeys(nil)
-	keyPairs := ca.GetTLSKeyPairs()
-	for i := range keyPairs {
-		keyPairs[i].Key = nil
-	}
-	ca.SetTLSKeyPairs(keyPairs)
+	services.RemoveCASecrets(ca)
 }
 
 // GetCertAuthorities returns a list of authorities of a given type

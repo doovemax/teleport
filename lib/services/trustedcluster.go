@@ -86,6 +86,9 @@ type TrustedClusterV2 struct {
 	// Kind is a resource kind - always resource.
 	Kind string `json:"kind"`
 
+	// SubKind is a resource sub kind
+	SubKind string `json:"sub_kind,omitempty"`
+
 	// Version is a resource version.
 	Version string `json:"version"`
 
@@ -270,6 +273,16 @@ func (c *TrustedClusterV2) CheckAndSetDefaults() error {
 		return trace.Wrap(err)
 	}
 	return nil
+}
+
+// GetKind returns resource kind
+func (c *TrustedClusterV2) GetKind() string {
+	return c.Kind
+}
+
+// GetSubKind returns resource sub kind
+func (c *TrustedClusterV2) GetSubKind() string {
+	return c.SubKind
 }
 
 // GetResourceID returns resource ID

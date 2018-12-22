@@ -88,6 +88,9 @@ type LicenseV3 struct {
 	// Kind is a resource kind - always resource.
 	Kind string `json:"kind"`
 
+	// SubKind is a resource sub kind
+	SubKind string `json:"sub_kind,omitempty"`
+
 	// Version is a resource version.
 	Version string `json:"version"`
 
@@ -96,6 +99,16 @@ type LicenseV3 struct {
 
 	// Spec is the specification of the resource.
 	Spec LicenseSpecV3 `json:"spec"`
+}
+
+// GetSubKind returns resource sub kind
+func (c *LicenseV3) GetSubKind() string {
+	return c.SubKind
+}
+
+// GetKind returns resource kind
+func (c *LicenseV3) GetKind() string {
+	return c.Kind
 }
 
 // GetResourceID returns resource ID

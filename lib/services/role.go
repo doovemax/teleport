@@ -378,6 +378,8 @@ func applyValueTraits(val string, traits map[string][]string) ([]string, error) 
 type RoleV3 struct {
 	// Kind is the type of resource.
 	Kind string `json:"kind"`
+	// SubKind is a resource sub kind
+	SubKind string `json:"sub_kind,omitempty"`
 	// Version is the resource version.
 	Version string `json:"version"`
 	// Metadata is resource metadata.
@@ -387,6 +389,16 @@ type RoleV3 struct {
 	// rawObject is the raw object stored in the backend without any
 	// conversions applied, used in migrations.
 	rawObject interface{}
+}
+
+// GetKind returns resource kind
+func (r *RoleV3) GetKind() string {
+	return r.Kind
+}
+
+// GetSubKind returns resource sub kind
+func (r *RoleV3) GetSubKind() string {
+	return r.SubKind
 }
 
 // GetResourceID returns resource ID

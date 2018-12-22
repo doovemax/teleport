@@ -144,12 +144,13 @@ func (w *watcher) Close() error {
 func parseCertAuthority(event backend.Event) (services.Resource, error) {
 	switch event.Type {
 	case backend.OpDelete:
-		name, err := base(event.Item.Key)
+		caType, name, err := splitCertAuthorityKey(event.Item.Key)
 		if err != nil {
 			return nil, trace.Wrap(err)
 		}
 		return &services.ResourceHeader{
 			Kind:    services.KindCertAuthority,
+			SubKind: caType,
 			Version: services.V3,
 			Metadata: services.Metadata{
 				Name:      string(name),
@@ -176,6 +177,15 @@ func base(key []byte) ([]byte, error) {
 		return nil, trace.NotFound("failed parsing %v", string(key))
 	}
 	return parts[len(parts)-1], nil
+}
+
+// splitCertAuthorityKey returns key and cert authority type
+func splitCertAuthorityKey(key []byte) (string, []byte, error) {
+	parts := bytes.Split(key, []byte{backend.Separator})
+	if len(parts) < 2 {
+		return "", nil, trace.NotFound("failed parsing %v", string(key))
+	}
+	return string(parts[len(parts)-2]), parts[len(parts)-1], nil
 }
 
 type parserFunc func(i backend.Event) (services.Resource, error)

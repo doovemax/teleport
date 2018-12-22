@@ -289,6 +289,7 @@ const V2SchemaTemplate = `{
   "required": ["kind", "spec", "metadata", "version"],
   "properties": {
     "kind": {"type": "string"},
+    "sub_kind": {"type": "string"},
     "version": {"type": "string", "default": "v2"},
     "metadata": %v,
     "spec": %v
@@ -367,6 +368,16 @@ func (h *ResourceHeader) GetMetadata() Metadata {
 	return h.Metadata
 }
 
+// GetKind returns resource kind
+func (h *ResourceHeader) GetKind() string {
+	return h.Kind
+}
+
+// GetSubKind returns resource subkind
+func (h *ResourceHeader) GetSubKind() string {
+	return h.SubKind
+}
+
 // UnmarshalJSON unmarshals header and captures raw state
 func (u *UnknownResource) UnmarshalJSON(raw []byte) error {
 	var h ResourceHeader
@@ -381,6 +392,10 @@ func (u *UnknownResource) UnmarshalJSON(raw []byte) error {
 
 // Resource represents common properties for resources
 type Resource interface {
+	// GetKind returns resource kind
+	GetKind() string
+	// GetSubKind returns resource subkind
+	GetSubKind() string
 	// GetName returns the name of the resource
 	GetName() string
 	// SetName sets the name of the resource

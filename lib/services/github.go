@@ -76,6 +76,8 @@ func NewGithubConnector(name string, spec GithubConnectorSpecV3) GithubConnector
 type GithubConnectorV3 struct {
 	// Kind is a resource kind, for Github connector it is "github"
 	Kind string `json:"kind"`
+	// SubKind is a resource sub kind
+	SubKind string `json:"sub_kind,omitempty"`
 	// Version is resource version
 	Version string `json:"version"`
 	// Metadata is resource metadata
@@ -116,6 +118,16 @@ type GithubClaims struct {
 	Username string
 	// OrganizationToTeams is the user's organization and team membership
 	OrganizationToTeams map[string][]string
+}
+
+// GetKind returns resource kind
+func (c *GithubConnectorV3) GetKind() string {
+	return c.Kind
+}
+
+// GetSubKind returns resource sub kind
+func (c *GithubConnectorV3) GetSubKind() string {
+	return c.SubKind
 }
 
 // GetResourceID returns resource ID

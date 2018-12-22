@@ -844,6 +844,7 @@ func (s *ServicesTestSuite) Events(c *check.C) {
 		c.Assert(event.Type, check.Equals, backend.OpDelete)
 		header := &services.ResourceHeader{
 			Kind:     services.KindCertAuthority,
+			SubKind:  string(services.UserCA),
 			Version:  services.V3,
 			Metadata: ca.GetMetadata(),
 		}

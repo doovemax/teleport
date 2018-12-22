@@ -66,6 +66,16 @@ func ServersToV1(in []Server) []ServerV1 {
 	return out
 }
 
+// GetKind returns resource kind
+func (s *ServerV2) GetKind() string {
+	return s.Kind
+}
+
+// GetSubKind returns resource sub kind
+func (s *ServerV2) GetSubKind() string {
+	return s.SubKind
+}
+
 // GetResourceID returns resource ID
 func (s *ServerV2) GetResourceID() int64 {
 	return s.Metadata.ID

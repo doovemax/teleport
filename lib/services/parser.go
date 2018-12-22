@@ -237,10 +237,22 @@ var emptyUser = &UserV2{}
 type EmptyResource struct {
 	// Kind is a resource kind
 	Kind string `json:"kind"`
+	// SubKind is a resource sub kind
+	SubKind string `json:"sub_kind,omitempty"`
 	// Version is a resource version
 	Version string `json:"version"`
 	// Metadata is Role metadata
 	Metadata Metadata `json:"metadata"`
+}
+
+// GetSubKind returns resource sub kind
+func (r *EmptyResource) GetSubKind() string {
+	return r.SubKind
+}
+
+// GetKind returns resource kind
+func (r *EmptyResource) GetKind() string {
+	return r.Kind
 }
 
 // GetResourceID returns resource ID

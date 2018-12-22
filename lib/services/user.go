@@ -186,6 +186,8 @@ func (la *LoginAttempt) Check() error {
 type UserV2 struct {
 	// Kind is a resource kind
 	Kind string `json:"kind"`
+	// SubKind is a resource sub kind
+	SubKind string `json:"sub_kind,omitempty"`
 	// Version is version
 	Version string `json:"version"`
 	// Metadata is User metadata
@@ -194,6 +196,16 @@ type UserV2 struct {
 	Spec UserSpecV2 `json:"spec"`
 	// rawObject contains raw object representation
 	rawObject interface{}
+}
+
+// GetKind returns resource kind
+func (u *UserV2) GetKind() string {
+	return u.Kind
+}
+
+// GetSubKind returns resource sub kind
+func (u *UserV2) GetSubKind() string {
+	return u.SubKind
 }
 
 // GetResourceID returns resource ID

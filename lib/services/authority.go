@@ -279,6 +279,16 @@ func CertAuthoritiesToV1(in []CertAuthority) ([]CertAuthorityV1, error) {
 	return out, nil
 }
 
+// GetKind returns resource kind
+func (c *CertAuthorityV2) GetKind() string {
+	return c.Kind
+}
+
+// GetSubKind returns resource sub kind
+func (c *CertAuthorityV2) GetSubKind() string {
+	return c.SubKind
+}
+
 // Clone returns a copy of the cert authority object.
 func (c *CertAuthorityV2) Clone() CertAuthority {
 	out := *c
@@ -540,6 +550,17 @@ func (ca *CertAuthorityV2) CheckAndSetDefaults() error {
 	}
 
 	return nil
+}
+
+// RemoveCASecrets removes secret values and keys
+// from the certificate authority
+func RemoveCASecrets(ca CertAuthority) {
+	ca.SetSigningKeys(nil)
+	keyPairs := ca.GetTLSKeyPairs()
+	for i := range keyPairs {
+		keyPairs[i].Key = nil
+	}
+	ca.SetTLSKeyPairs(keyPairs)
 }
 
 const (

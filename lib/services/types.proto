@@ -79,10 +79,12 @@ message RotationSchedule {
 message ResourceHeader {
     // Kind is a resource kind
     string Kind = 1 [(gogoproto.jsontag) = "kind,omitempty"];
+    // SubKind is an optional resource sub kind, used in some resources
+	string SubKind = 2 [(gogoproto.jsontag) = "sub_kind,omitempty"];    
 	// Version is version
-    string Version = 2 [(gogoproto.jsontag) = "version,omitempty"];
+    string Version = 3 [(gogoproto.jsontag) = "version,omitempty"];
 	// Metadata is User metadata
-    Metadata Metadata = 3 [(gogoproto.nullable) = false, (gogoproto.jsontag) = "metadata,omitempty"];
+    Metadata Metadata = 4 [(gogoproto.nullable) = false, (gogoproto.jsontag) = "metadata,omitempty"];
 }
 
 // ServerV2 represents a Node, Proxy or Auth server in a Teleport cluster
@@ -92,12 +94,14 @@ message ServerV2 {
 
     // Kind is a resource kind
     string Kind = 1 [(gogoproto.jsontag) = "kind"];
+    // SubKind is an optional resource sub kind, used in some resources
+	string SubKind = 2 [(gogoproto.jsontag) = "sub_kind,omitempty"];
 	// Version is version    
-    string Version = 2 [(gogoproto.jsontag) = "version"];
+    string Version = 3 [(gogoproto.jsontag) = "version"];
 	// Metadata is User metadata    
-    Metadata Metadata = 3 [(gogoproto.nullable) = false, (gogoproto.jsontag) = "metadata"];
+    Metadata Metadata = 4 [(gogoproto.nullable) = false, (gogoproto.jsontag) = "metadata"];
     // Spec is a server spec
-    ServerSpecV2 Spec = 4 [(gogoproto.nullable) = false, (gogoproto.jsontag) = "spec"];
+    ServerSpecV2 Spec = 5 [(gogoproto.nullable) = false, (gogoproto.jsontag) = "spec"];
 }
 
 // ServerSpecV2 is a specification for V2 Server
@@ -140,12 +144,14 @@ message CertAuthorityV2 {
     option (gogoproto.stringer) = false;
 	// Kind is a resource kind
 	string Kind = 1 [(gogoproto.jsontag) = "kind"];
+    // SubKind is an optional resource sub kind, used in some resources
+	string SubKind = 2 [(gogoproto.jsontag) = "sub_kind,omitempty"];        
 	// Version is version
-	string Version = 2 [(gogoproto.jsontag) = "version"];
+	string Version = 3 [(gogoproto.jsontag) = "version"];
 	// Metadata is connector metadata
-	Metadata Metadata = 3 [(gogoproto.nullable) = false, (gogoproto.jsontag) = "metadata"];
+	Metadata Metadata = 4 [(gogoproto.nullable) = false, (gogoproto.jsontag) = "metadata"];
 	// Spec contains cert authority specification
-	CertAuthoritySpecV2 Spec = 4 [(gogoproto.nullable) = false, (gogoproto.jsontag) = "spec"];
+	CertAuthoritySpecV2 Spec = 5 [(gogoproto.nullable) = false, (gogoproto.jsontag) = "spec"];
 }
 
 // CertAuthoritySpecV2 is a host or user certificate authority that

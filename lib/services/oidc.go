@@ -200,12 +200,24 @@ func (*TeleportOIDCConnectorMarshaler) MarshalOIDCConnector(c OIDCConnector, opt
 type OIDCConnectorV2 struct {
 	// Kind is a resource kind
 	Kind string `json:"kind"`
+	// SubKind is a resource sub kind
+	SubKind string `json:"sub_kind,omitempty"`
 	// Version is version
 	Version string `json:"version"`
 	// Metadata is connector metadata
 	Metadata Metadata `json:"metadata"`
 	// Spec contains connector specification
 	Spec OIDCConnectorSpecV2 `json:"spec"`
+}
+
+// GetSubKind returns resource sub kind
+func (o *OIDCConnectorV2) GetSubKind() string {
+	return o.SubKind
+}
+
+// GetKind returns resource kind
+func (o *OIDCConnectorV2) GetKind() string {
+	return o.Kind
 }
 
 // GetResourceID returns resource ID

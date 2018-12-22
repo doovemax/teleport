@@ -66,6 +66,9 @@ type ClusterNameV2 struct {
 	// Kind is a resource kind - always resource.
 	Kind string `json:"kind"`
 
+	// SubKind is a resource sub kind
+	SubKind string `json:"sub_kind,omitempty"`
+
 	// Version is a resource version.
 	Version string `json:"version"`
 
@@ -81,6 +84,16 @@ type ClusterNameSpecV2 struct {
 	// ClusterName is the name of the cluster. Changing this value once the
 	// cluster is setup can and will cause catastrophic problems.
 	ClusterName string `json:"cluster_name"`
+}
+
+// GetKind returns resource kind
+func (c *ClusterNameV2) GetKind() string {
+	return c.Kind
+}
+
+// GetSubKind returns resource sub kind
+func (c *ClusterNameV2) GetSubKind() string {
+	return c.SubKind
 }
 
 // GetResourceID returns resource ID

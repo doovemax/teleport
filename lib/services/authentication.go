@@ -80,6 +80,9 @@ type AuthPreferenceV2 struct {
 	// Kind is a resource kind - always resource.
 	Kind string `json:"kind"`
 
+	// SubKind is a resource sub kind
+	SubKind string `json:"sub_kind,omitempty"`
+
 	// Version is a resource version.
 	Version string `json:"version"`
 
@@ -88,6 +91,16 @@ type AuthPreferenceV2 struct {
 
 	// Spec is the specification of the resource.
 	Spec AuthPreferenceSpecV2 `json:"spec"`
+}
+
+// GetKind returns resource kind
+func (c *AuthPreferenceV2) GetKind() string {
+	return c.Kind
+}
+
+// GetSubKind returns resource subkind
+func (c *AuthPreferenceV2) GetSubKind() string {
+	return c.SubKind
 }
 
 // GetType returns the type of authentication.

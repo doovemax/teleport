@@ -51,12 +51,24 @@ func NewReverseTunnel(clusterName string, dialAddrs []string) ReverseTunnel {
 type ReverseTunnelV2 struct {
 	// Kind is a resource kind - always resource
 	Kind string `json:"kind"`
+	// SubKind is a resource sub kind
+	SubKind string `json:"sub_kind,omitempty"`
 	// Version is a resource version
 	Version string `json:"version"`
 	// Metadata is Role metadata
 	Metadata Metadata `json:"metadata"`
 	// Spec contains user specification
 	Spec ReverseTunnelSpecV2 `json:"spec"`
+}
+
+// GetKind returns resource kind
+func (r *ReverseTunnelV2) GetKind() string {
+	return r.Kind
+}
+
+// GetSubKind returns resource sub kind
+func (r *ReverseTunnelV2) GetSubKind() string {
+	return r.SubKind
 }
 
 // GetResourceID returns resource ID

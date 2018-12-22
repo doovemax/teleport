@@ -64,6 +64,9 @@ type RemoteClusterV3 struct {
 	// Kind is a resource kind - always resource.
 	Kind string `json:"kind"`
 
+	// SubKind is a resource sub kind
+	SubKind string `json:"sub_kind,omitempty"`
+
 	// Version is a resource version.
 	Version string `json:"version"`
 
@@ -80,6 +83,16 @@ type RemoteClusterStatusV3 struct {
 	Connection string `json:"connection"`
 	// LastHeartbeat records last heartbeat of the cluster
 	LastHeartbeat time.Time `json:"last_heartbeat"`
+}
+
+// GetKind returns resource kind
+func (c *RemoteClusterV3) GetKind() string {
+	return c.Kind
+}
+
+// GetSubKind returns resource sub kind
+func (c *RemoteClusterV3) GetSubKind() string {
+	return c.SubKind
 }
 
 // GetResourceID returns resource ID

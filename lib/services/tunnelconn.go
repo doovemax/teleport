@@ -96,12 +96,24 @@ func NewTunnelConnection(name string, spec TunnelConnectionSpecV2) (TunnelConnec
 type TunnelConnectionV2 struct {
 	// Kind is a resource kind
 	Kind string `json:"kind"`
+	// SubKind is a resource sub kind
+	SubKind string `json:"sub_kind,omitempty"`
 	// Version is a resource version
 	Version string `json:"version"`
 	// Metadata is Role metadata
 	Metadata Metadata `json:"metadata"`
 	// Spec contains user specification
 	Spec TunnelConnectionSpecV2 `json:"spec"`
+}
+
+// GetKind returns resource kind
+func (r *TunnelConnectionV2) GetKind() string {
+	return r.Kind
+}
+
+// GetSubKind returns resource sub kind
+func (r *TunnelConnectionV2) GetSubKind() string {
+	return r.SubKind
 }
 
 // GetResourceID returns resource ID
