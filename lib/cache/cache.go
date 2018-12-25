@@ -168,15 +168,18 @@ func (c *Cache) fetch() (int64, error) {
 }
 
 func (c *Cache) fetchAndWatch() error {
-	resourceID, err := c.fetch()
-	if err != nil {
-		return trace.Wrap(err)
-	}
 	watcher, err := c.Events.NewWatcher(c.ctx, services.Watch{Kinds: []string{services.KindCertAuthority}})
 	if err != nil {
 		return trace.Wrap(err)
 	}
 	defer watcher.Close()
+	// here we need a sentinel event, to make sure subscription channel has been established,
+	// so we don't skip any notifications since the fetch.
+
+	resourceID, err := c.fetch()
+	if err != nil {
+		return trace.Wrap(err)
+	}
 	c.notify(CacheEvent{Type: WatcherStarted})
 updateloop:
 	for {

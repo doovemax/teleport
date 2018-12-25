@@ -32,7 +32,6 @@ import (
 
 	"github.com/gravitational/trace"
 	"github.com/jonboulle/clockwork"
-	log "github.com/sirupsen/logrus"
 	"gopkg.in/check.v1"
 )
 
@@ -161,18 +160,22 @@ func (s *CacheSuite) TestRecovery(c *check.C) {
 	c.Assert(watchers, check.HasLen, 1)
 	events.closeWatchers()
 
-	// add modification and expect the resource to recover
-	ca2 := suite.NewTestCA(services.UserCA, "example2.com")
-	c.Assert(trust.UpsertCertAuthority(ca2), check.IsNil)
-
-	authorities, err := trust.GetCertAuthorities(services.UserCA, false, services.SkipValidation())
-	c.Assert(err, check.IsNil)
-	log.Debugf("Hardware appliance: %v", authorities)
-
 	// wait for watcher to restart
 	select {
 	case event := <-eventsC:
 		c.Assert(event.Type, check.Equals, WatcherStarted)
+	case <-time.After(time.Second):
+		c.Fatalf("timeout waiting for event")
+	}
+
+	// add modification and expect the resource to recover
+	ca2 := suite.NewTestCA(services.UserCA, "example2.com")
+	c.Assert(trust.UpsertCertAuthority(ca2), check.IsNil)
+
+	// wait for watcher to receive an event
+	select {
+	case event := <-eventsC:
+		c.Assert(event.Type, check.Equals, EventProcessed)
 	case <-time.After(time.Second):
 		c.Fatalf("timeout waiting for event")
 	}
