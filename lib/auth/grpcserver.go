@@ -181,8 +181,15 @@ func (g *GRPCServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func eventToGRPC(in services.Event) (*proto.Event, error) {
+	eventType, err := eventTypeToGRPC(in.Type)
+	if err != nil {
+		return nil, trace.Wrap(err)
+	}
 	out := proto.Event{
-		Type: eventTypeToGRPC(in.Type),
+		Type: eventType,
+	}
+	if in.Type == backend.OpInit {
+		return &out, nil
 	}
 	switch r := in.Resource.(type) {
 	case *services.ResourceHeader:
@@ -199,16 +206,26 @@ func eventToGRPC(in services.Event) (*proto.Event, error) {
 	return &out, nil
 }
 
-func eventTypeToGRPC(in backend.OpType) proto.Operation {
-	if in == backend.OpPut {
-		return proto.Operation_PUT
+func eventTypeToGRPC(in backend.OpType) (proto.Operation, error) {
+	switch in {
+	case backend.OpInit:
+		return proto.Operation_INIT, nil
+	case backend.OpPut:
+		return proto.Operation_PUT, nil
+	case backend.OpDelete:
+		return proto.Operation_DELETE, nil
+	default:
+		return -1, trace.BadParameter("event type %v is not supported", in)
 	}
-	return proto.Operation_DELETE
 }
 
 func eventFromGRPC(in proto.Event) (*services.Event, error) {
+	eventType, err := eventTypeFromGRPC(in.Type)
+	if err != nil {
+		return nil, trace.Wrap(err)
+	}
 	out := services.Event{
-		Type: eventTypeFromGRPC(in.Type),
+		Type: eventType,
 	}
 	if r := in.GetResourceHeader(); r != nil {
 		out.Resource = r
@@ -221,9 +238,15 @@ func eventFromGRPC(in proto.Event) (*services.Event, error) {
 	}
 }
 
-func eventTypeFromGRPC(in proto.Operation) backend.OpType {
-	if in == proto.Operation_PUT {
-		return backend.OpPut
+func eventTypeFromGRPC(in proto.Operation) (backend.OpType, error) {
+	switch in {
+	case proto.Operation_INIT:
+		return backend.OpInit, nil
+	case proto.Operation_PUT:
+		return backend.OpPut, nil
+	case proto.Operation_DELETE:
+		return backend.OpDelete, nil
+	default:
+		return -1, trace.BadParameter("unsupported operation type: %v", in)
 	}
-	return backend.OpDelete
 }

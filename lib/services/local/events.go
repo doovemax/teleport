@@ -94,6 +94,9 @@ func (w *watcher) Error() error {
 
 func (w *watcher) parseEvent(e backend.Event) (*services.Event, error) {
 	for _, p := range w.parsers {
+		if e.Type == backend.OpInit {
+			return &services.Event{Type: e.Type}, nil
+		}
 		if bytes.HasPrefix(e.Item.Key, p.prefix) {
 			resource, err := p.parser(e)
 			if err != nil {

@@ -175,6 +175,15 @@ func (c *CircularBuffer) NewWatcher(ctx context.Context, watch Watch) (Watcher, 
 		ctx:     closeCtx,
 		cancel:  cancel,
 	}
+	select {
+	case w.eventsC <- Event{Type: OpInit}:
+	case <-c.ctx.Done():
+		return nil, trace.BadParameter("buffer is closed")
+	default:
+		c.Warningf("Closing watcher, buffer overflow.")
+		w.Close()
+		return nil, trace.BadParameter("buffer overflow")
+	}
 	c.watchers = append(c.watchers, w)
 	return w, nil
 }

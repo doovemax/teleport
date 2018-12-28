@@ -57,6 +57,8 @@ type Config struct {
 	Backend backend.Backend
 	// RetryPeriod is a period between cache retries on failures
 	RetryPeriod time.Duration
+	// ReloadPeriod is a period when cache performs full reload
+	ReloadPeriod time.Duration
 	// EventsC is a channel for event notifications,
 	// used in tests
 	EventsC chan CacheEvent
@@ -78,6 +80,9 @@ func (c *Config) CheckAndSetDefaults() error {
 	}
 	if c.RetryPeriod == 0 {
 		c.RetryPeriod = defaults.HighResPollingPeriod
+	}
+	if c.ReloadPeriod == 0 {
+		c.ReloadPeriod = defaults.LowResPollingPeriod
 	}
 	return nil
 }
@@ -130,9 +135,13 @@ type instance struct {
 func (c *Cache) update() {
 	t := time.NewTicker(c.RetryPeriod)
 	defer t.Stop()
+
+	r := time.NewTicker(c.ReloadPeriod)
+	defer r.Stop()
 	for {
 		select {
 		case <-t.C:
+		case <-r.C:
 		case <-c.ctx.Done():
 			return
 		}
@@ -173,9 +182,33 @@ func (c *Cache) fetchAndWatch() error {
 		return trace.Wrap(err)
 	}
 	defer watcher.Close()
-	// here we need a sentinel event, to make sure subscription channel has been established,
-	// so we don't skip any notifications since the fetch.
-
+	// before fetch, make sure watcher is synced by receiving init event,
+	// to avoid the scenario:
+	// 1. Cache process:   w = NewWatcher()
+	// 2. Cache process:   c.fetch()
+	// 3. Backend process: addItem()
+	// 4. Cache process:   <- w.Events()
+	//
+	// If there is a way that NewWatcher() on line 1 could
+	// return without subscription established first,
+	// Code line 3 could execute and line 4 could miss event,
+	// wrapping up with out of sync replica.
+	// To avoid this, before doing fetch,
+	// cache process makes sure the connection is established
+	// by receiving init event first.
+	select {
+	case <-watcher.Done():
+		if err != nil {
+			return trace.Wrap(watcher.Error())
+		}
+		return trace.ConnectionProblem(nil, "unexpected watcher close")
+	case <-c.ctx.Done():
+		return trace.ConnectionProblem(c.ctx.Err(), "context is closing")
+	case event := <-watcher.Events():
+		if event.Type != backend.OpInit {
+			return trace.BadParameter("expected init event, got %v instead", event.Type)
+		}
+	}
 	resourceID, err := c.fetch()
 	if err != nil {
 		return trace.Wrap(err)

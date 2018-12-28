@@ -189,3 +189,26 @@ message RoleMapping {
 	// Local specifies local roles to map to
 	repeated string Local = 2 [(gogoproto.jsontag) = "local"];
 }
+
+// ProvisionTokenV3 specifies provisioning token
+message ProvisionTokenV2 {
+    option (gogoproto.goproto_stringer) = false;
+    option (gogoproto.stringer) = false;
+
+    // Kind is a resource kind
+    string Kind = 1 [(gogoproto.jsontag) = "kind"];
+    // SubKind is an optional resource sub kind, used in some resources
+	string SubKind = 2 [(gogoproto.jsontag) = "sub_kind,omitempty"];
+	// Version is version    
+    string Version = 3 [(gogoproto.jsontag) = "version"];
+	// Metadata is User metadata    
+    Metadata Metadata = 4 [(gogoproto.nullable) = false, (gogoproto.jsontag) = "metadata"];
+    // Spec is a provisioning token V2 spec
+    ProvisionTokenSpecV2 Spec = 5 [(gogoproto.nullable) = false, (gogoproto.jsontag) = "spec"];
+}
+
+// ProvisionTokenSpecV3 is a specification for V3 token
+message ProvisionTokenSpecV2  {
+	// Roles is a list of roles assigned to the token
+	repeated string Roles = 1 [(gogoproto.jsontag) = "roles", (gogoproto.casttype) = "github.com/gravitational/teleport.Role"];
+}

@@ -11,10 +11,13 @@ option (gogoproto.goproto_getters_all) = false;
 
 // Operation identifies type of operation
 enum Operation {
+    // INIT is sent as a first sentinel event
+    // on the watch channel
+    INIT   = 0;
     // PUT identifies created or updated object
-    PUT    = 0;
+    PUT    = 1;
     // DELETE identifies deleted object
-    DELETE = 1;
+    DELETE = 2;
 }
 
 // Event returns cluster event

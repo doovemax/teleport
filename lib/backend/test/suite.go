@@ -351,6 +351,15 @@ func (s *BackendSuite) Events(c *check.C) {
 	c.Assert(err, check.IsNil)
 	defer watcher.Close()
 
+	select {
+	case e := <-watcher.Events():
+		c.Assert(string(e.Type), check.Equals, string(backend.OpInit))
+	case <-watcher.Done():
+		c.Fatalf("Watcher has unexpectedly closed.")
+	case <-time.After(2 * time.Second):
+		c.Fatalf("Timeout waiting for event.")
+	}
+
 	item := &backend.Item{Key: prefix("b"), Value: []byte("val")}
 	_, err = s.B.Put(ctx, *item)
 	c.Assert(err, check.IsNil)
